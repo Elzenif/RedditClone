@@ -1,7 +1,8 @@
 package gso.training.reddit.service;
 
 import gso.training.reddit.dto.SubredditDto;
-import gso.training.reddit.model.Subreddit;
+import gso.training.reddit.exception.SpringRedditException;
+import gso.training.reddit.mapper.SubredditMapper;
 import gso.training.reddit.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,35 +18,26 @@ import java.util.stream.Collectors;
 public class SubredditService {
 
     private final SubredditRepository subredditRepository;
+    private final SubredditMapper subredditMapper;
 
     @Transactional
     public SubredditDto save(SubredditDto subredditDto) {
-        var subreddit = subredditRepository.save(mapSubredditDto(subredditDto));
+        var subreddit = subredditRepository.save(subredditMapper.mapDtoToSubreddit(subredditDto));
         subredditDto.setId(subreddit.getId());
         return subredditDto;
-    }
-
-    private Subreddit mapSubredditDto(SubredditDto subredditDto) {
-        return Subreddit.builder()
-            .name(subredditDto.getName())
-            .description(subredditDto.getDescription())
-            .build();
     }
 
     @Transactional(readOnly = true)
     public List<SubredditDto> getAll() {
         return subredditRepository.findAll()
             .stream()
-            .map(this::mapToDto)
+            .map(subredditMapper::mapSubredditToDto)
             .collect(Collectors.toList());
     }
 
-    private SubredditDto mapToDto(Subreddit subreddit) {
-        return SubredditDto.builder()
-            .id(subreddit.getId())
-            .name(subreddit.getName())
-            .numberOfPosts(subreddit.getPosts().size())
-            .build();
+    public SubredditDto getSubreddit(Long id) {
+        var subreddit = subredditRepository.findById(id)
+            .orElseThrow(() -> new SpringRedditException("No subreddit found with id: " + id));
+        return subredditMapper.mapSubredditToDto(subreddit);
     }
-
 }
