@@ -1,7 +1,7 @@
 package gso.training.reddit.service;
 
 import gso.training.reddit.dto.SubredditDto;
-import gso.training.reddit.exception.SpringRedditException;
+import gso.training.reddit.exception.SubredditNotFoundException;
 import gso.training.reddit.mapper.SubredditMapper;
 import gso.training.reddit.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ public class SubredditService {
 
     public SubredditDto getSubreddit(Long id) {
         var subreddit = subredditRepository.findById(id)
-            .orElseThrow(() -> new SpringRedditException("No subreddit found with id: " + id));
+            .orElseThrow(() -> new SubredditNotFoundException(id));
         return subredditMapper.mapSubredditToDto(subreddit);
     }
 }

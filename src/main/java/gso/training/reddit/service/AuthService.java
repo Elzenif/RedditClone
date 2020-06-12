@@ -5,6 +5,7 @@ import gso.training.reddit.dto.LoginRequest;
 import gso.training.reddit.dto.NotificationEmail;
 import gso.training.reddit.dto.RegisterRequest;
 import gso.training.reddit.exception.SpringRedditException;
+import gso.training.reddit.exception.UsernameNotFoundException;
 import gso.training.reddit.model.User;
 import gso.training.reddit.model.VerificationToken;
 import gso.training.reddit.repository.UserRepository;
@@ -81,19 +82,27 @@ public class AuthService {
     private void fetchUserAndEnable(VerificationToken verificationToken) {
         var username = verificationToken.getUser().getUsername();
         var user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new SpringRedditException("User not found : " + username));
+            .orElseThrow(() -> new UsernameNotFoundException(username));
         user.setEnabled(true);
         userRepository.save(user);
     }
 
     @Transactional
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+        var authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+            loginRequest.getPassword());
         var authenticate = authenticationManager
             .authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         var token = jwtProvider.generateToken(authenticationToken);
 
         return new AuthenticationResponse(token, loginRequest.getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        var username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }
