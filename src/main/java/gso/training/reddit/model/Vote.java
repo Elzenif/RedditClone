@@ -11,11 +11,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "UK_postId_userId", columnNames = {
+    "postId", "userId"
+}))
 @Data
 @Builder
 @AllArgsConstructor

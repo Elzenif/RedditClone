@@ -1,6 +1,7 @@
 package gso.training.reddit.repository;
 
 import gso.training.reddit.model.Comment;
+import gso.training.reddit.model.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +23,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         "INNER JOIN c.user u " +
         "WHERE u.username = :username")
     List<Comment> findAllByUsername(@Param("username") String username);
+
+    Integer countByPost(Post post);
 }

@@ -32,21 +32,21 @@ public class PostService {
             .orElseThrow(() -> new SubredditNotFoundException(postRequest.getSubredditName()));
         var user = authService.getCurrentUser();
 
-        postRepository.save(postMapper.mapRequestToPost(postRequest, subreddit, user));
+        postRepository.save(postMapper.map(postRequest, subreddit, user));
     }
 
     @Transactional(readOnly = true)
     public PostResponse getPost(Long id) {
         var post = postRepository.findById(id)
             .orElseThrow(() -> new PostNotFoundException(id));
-        return postMapper.mapPostToResponse(post);
+        return postMapper.mapToDto(post);
     }
 
     @Transactional(readOnly = true)
     public List<PostResponse> getAllPosts() {
         return postRepository.findAll()
             .stream()
-            .map(postMapper::mapPostToResponse)
+            .map(postMapper::mapToDto)
             .collect(toList());
     }
 
@@ -54,7 +54,7 @@ public class PostService {
     public List<PostResponse> getPostsBySubreddit(Long subredditId) {
         return postRepository.findBySubreddit(subredditId)
             .stream()
-            .map(postMapper::mapPostToResponse)
+            .map(postMapper::mapToDto)
             .collect(toList());
     }
 
@@ -62,7 +62,7 @@ public class PostService {
     public List<PostResponse> getPostsByUsername(String username) {
         return postRepository.findByUsername(username)
             .stream()
-            .map(postMapper::mapPostToResponse)
+            .map(postMapper::mapToDto)
             .collect(toList());
     }
 }

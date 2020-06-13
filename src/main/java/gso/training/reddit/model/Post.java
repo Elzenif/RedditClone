@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
-
 import java.time.Instant;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -33,7 +32,7 @@ public class Post {
     private String url;
     @Lob
     private String description;
-    private Integer voteCount;
+    private Integer voteCount = 0;
     private Instant createdDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "id")
