@@ -5,7 +5,6 @@ import gso.training.reddit.dto.PostResponse;
 import gso.training.reddit.exception.PostNotFoundException;
 import gso.training.reddit.exception.SubredditNotFoundException;
 import gso.training.reddit.mapper.PostMapper;
-import gso.training.reddit.model.Post;
 import gso.training.reddit.repository.PostRepository;
 import gso.training.reddit.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
@@ -28,12 +27,12 @@ public class PostService {
     private final PostMapper postMapper;
 
     @Transactional
-    public Post save(PostRequest postRequest) {
+    public void save(PostRequest postRequest) {
         var subreddit = subredditRepository.findByName(postRequest.getSubredditName())
             .orElseThrow(() -> new SubredditNotFoundException(postRequest.getSubredditName()));
         var user = authService.getCurrentUser();
 
-        return postRepository.save(postMapper.mapRequestToPost(postRequest, subreddit, user));
+        postRepository.save(postMapper.mapRequestToPost(postRequest, subreddit, user));
     }
 
     @Transactional(readOnly = true)
